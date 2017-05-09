@@ -1,0 +1,3 @@
+# JMXTrans docker container for eXo
+
+This container aims to collect eXo Platform metrics.
