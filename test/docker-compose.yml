@@ -1,0 +1,98 @@
+version: '2'
+services:
+  jmxtrans:
+    image: exoplatform/jmxtrans
+    environment: 
+      TARGET_JMX_HOST: exo
+      TARGET_HOSTNAME: exo
+      TARGET_JMX_PORT: 10001
+      TARGET_INFLUXDB_URL: http://influxdb:8086
+      JMXTRANS_LOG_LEVEL: debug
+      TARGET_INFLUXDB_CREATE_DB: "true"
+    links:
+      - exo
+      - influxdb
+    depends_on: 
+      - exo
+      - influxdb
+  influxdb:
+    image: influxdb:1.2-alpine
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+  grafana:
+    image: grafana/grafana:4.3.2
+    environment: 
+      GF_PATHS_DATA: /var/lib/grafana
+      GF_PATHS_DATA: /var/lib/grafana
+      GF_SERVER_HTTP_PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on: 
+      - influxdb
+  exo:
+    image: exoplatform/exo-community
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    environment:
+      EXO_DB_TYPE: mysql
+      EXO_DB_NAME: exo
+      EXO_DB_USER: exo
+      EXO_DB_PASSWORD: exo
+      EXO_DB_HOST: db
+      EXO_ADDONS_LIST: 
+      EXO_ES_EMBEDDED: "true"
+      #EXO_ES_HOST: search
+      EXO_PROXY_VHOST: localhost
+      EXO_PROXY_SSL: "false"
+      EXO_JVM_SIZE_MIN: "2g"
+      EXO_JVM_SIZE_MAX: "3g"
+      EXO_MAIL_SMTP_HOST: "mail"
+      EXO_MAIL_SMTP_PORT: "1025"
+      EXO_JMX_RMI_REGISTRY_PORT: 10001
+      EXO_JMX_RMI_SERVER_PORT: 10002
+      EXO_JMX_RMI_SERVER_HOSTNAME: exo
+    expose:
+      - "8080"
+    links:
+      - db
+    depends_on:
+      - db
+      - mail
+    volumes:
+      - exo_data:/srv
+      - exo_logs:/var/log/exo
+  mongo:
+    image: mongo:3.2
+    volumes:
+      - mongo_data:/data/db:rw
+  db:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: exo
+      MYSQL_USER: exo
+      MYSQL_PASSWORD: exo
+    volumes:
+      - db_data:/var/lib/mysql:rw
+  mail:
+    image: mailhog/mailhog
+    environment:
+      MH_SMTP_BIND_ADDR: 0.0.0.0:1025
+      MH_STORAGE: mongodb
+      MH_MONGO_URI: mongo:27017
+      MH_MONGO_DB: mailhog
+      MH_MONGO_COLLECTION: messages
+      MH_UI_WEB_PATH: mail
+    depends_on:
+      - mongo
+volumes:
+  influxdb_data:
+  grafana_data:
+  exo_data:
+  exo_logs:
+  db_data:
+  mongo_data:

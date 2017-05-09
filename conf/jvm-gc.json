@@ -1,0 +1,24 @@
+{
+	"servers" : [ {
+		"port" : "${TARGET_JMX_PORT}",
+		"host" : "${TARGET_JMX_HOST}",
+		"queries" : [ {
+			"outputWriters" : [ {
+				"@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
+				"url" : "${TARGET_INFLUXDB_URL}",
+				"database" : "${TARGET_INFLUXDB_DATABASE}",
+				"createDatabase" : "${TARGET_INFLUXDB_CREATE_DB}",
+				"retentionPolicy" : "${TARGET_INFLUXDB_RETENTION_POLICY}",
+				"username" : "${TARGET_INFLUXDB_USERNAME}",
+				"password" : "${TARGET_INFLUXDB_PASSWORD}",
+				"tags" : {
+					"host" : "${TARGET_HOSTNAME}",
+					"node" : "${TARGET_NODE_ID}"
+				}
+			} ],
+			"obj" : "java.lang:type=GarbageCollector,name=*",
+			"resultAlias" : "jvm_gc",
+			"attr" : ["CollectionCount","CollectionTime"]
+		} ]
+	} ]
+}
