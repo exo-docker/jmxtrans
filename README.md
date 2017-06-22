@@ -51,7 +51,7 @@ Several aspects of JMXTrans container are customizable with the following enviro
 | TARGET_INFLUXDB_CREATE_DB | NO | `true` | does JMXTrans create the Influxdb database if needed
 | TARGET_INFLUXDB_RETENTION_POLICY | NO | `autogen` | the Influxdb rentention policy name to use
 | JMXTRANS_POOLING_FREQUENCY | NO | `30` | the JMXTrans pooling frequency in seconds
-| JMXTRANS_LOG_LEVEL | NO | `warn` | the JMXTrans logging level (debug\|info\|warn\|error\|fatal)
+| JMXTRANS_LOG_LEVEL | NO | `WARN` | the JMXTrans logging level (DEBUG|INFO|WARN|ERROR|FATAL)
 
 # Collected metrics
 
