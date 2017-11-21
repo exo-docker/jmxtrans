@@ -2,8 +2,8 @@
 # source: http://heiber.im/post/creating-a-solid-docker-base-image/
 #
 # build: docker build -t exoplatform/jmxtrans:latest .
-FROM openjdk:8-jdk
-MAINTAINER docker@exoplatform.com
+FROM    openjdk:8-jdk
+LABEL   maintainer="eXo Platform <docker@exoplatform.com>"
 
 ARG JMXTRANS_VERSION=265
 ENV TINI_VERSION v0.14.0
