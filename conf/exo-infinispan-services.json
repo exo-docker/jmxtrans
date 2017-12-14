@@ -1,0 +1,79 @@
+{
+  "servers" : [ {
+    "port" : "${TARGET_JMX_PORT}",
+    "host" : "${TARGET_JMX_HOST}",
+    "queries" : [ {
+      "outputWriters" : [ {
+        "@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
+        "url" : "${TARGET_INFLUXDB_URL}",
+        "database" : "${TARGET_INFLUXDB_DATABASE}",
+        "createDatabase" : "${TARGET_INFLUXDB_CREATE_DB}",
+        "retentionPolicy" : "${TARGET_INFLUXDB_RETENTION_POLICY}",
+        "username" : "${TARGET_INFLUXDB_USERNAME}",
+        "password" : "${TARGET_INFLUXDB_PASSWORD}",
+        "resultTags":["typeName","className"],
+        "tags" : {
+          "host" : "${TARGET_HOSTNAME}",
+          "node" : "${TARGET_NODE_ID}"
+        }
+      } ],
+      "obj" : "services.ispn.cache:type=Cache,name=*,manager=*,component=Statistics",
+      "resultAlias" : "exo_infinispan_services",
+      "attr" : ["hitRatio","hits","misses","numberOfEntries","stores","readWriteRatio","removeHits","removeMisses","evictions","averageReadTime","averageWriteTime","elapsedTime","timeSinceReset"]
+    }, {
+      "outputWriters" : [ {
+        "@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
+        "url" : "${TARGET_INFLUXDB_URL}",
+        "database" : "${TARGET_INFLUXDB_DATABASE}",
+        "createDatabase" : "${TARGET_INFLUXDB_CREATE_DB}",
+        "retentionPolicy" : "${TARGET_INFLUXDB_RETENTION_POLICY}",
+        "username" : "${TARGET_INFLUXDB_USERNAME}",
+        "password" : "${TARGET_INFLUXDB_PASSWORD}",
+        "resultTags":["typeName","className"],
+        "tags" : {
+          "host" : "${TARGET_HOSTNAME}",
+          "node" : "${TARGET_NODE_ID}"
+        }
+      } ],
+      "obj" : "services.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager",
+      "resultAlias" : "exo_infinispan_services_rpc",
+      "attr" : ["replicationCount","replicationFailures"]
+    }, {
+      "outputWriters" : [ {
+        "@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
+        "url" : "${TARGET_INFLUXDB_URL}",
+        "database" : "${TARGET_INFLUXDB_DATABASE}",
+        "createDatabase" : "${TARGET_INFLUXDB_CREATE_DB}",
+        "retentionPolicy" : "${TARGET_INFLUXDB_RETENTION_POLICY}",
+        "username" : "${TARGET_INFLUXDB_USERNAME}",
+        "password" : "${TARGET_INFLUXDB_PASSWORD}",
+        "resultTags":["typeName","className"],
+        "tags" : {
+          "host" : "${TARGET_HOSTNAME}",
+          "node" : "${TARGET_NODE_ID}"
+        }
+      } ],
+      "obj" : "services.ispn.cache:type=channel,cluster=*",
+      "resultAlias" : "exo_infinispan_services_channel",
+      "attr" : ["ReceivedBytes","ReceivedMessages"]
+    }, {
+      "outputWriters" : [ {
+        "@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
+        "url" : "${TARGET_INFLUXDB_URL}",
+        "database" : "${TARGET_INFLUXDB_DATABASE}",
+        "createDatabase" : "${TARGET_INFLUXDB_CREATE_DB}",
+        "retentionPolicy" : "${TARGET_INFLUXDB_RETENTION_POLICY}",
+        "username" : "${TARGET_INFLUXDB_USERNAME}",
+        "password" : "${TARGET_INFLUXDB_PASSWORD}",
+        "resultTags":["typeName","className"],
+        "tags" : {
+          "host" : "${TARGET_HOSTNAME}",
+          "node" : "${TARGET_NODE_ID}"
+        }
+      } ],
+      "obj" : "services.ispn.cache:type=protocol,cluster=*,protocol=TCP",
+      "resultAlias" : "exo_infinispan_services_protocol",
+      "attr" : ["OOBPoolSize","OOBQueueSize","RegularPoolSize","RegularQueueSize","OpenConnections"]
+    } ]
+  } ]
+}
