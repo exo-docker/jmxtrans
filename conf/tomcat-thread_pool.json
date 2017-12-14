@@ -1,8 +1,8 @@
 {
-    "servers" : [{
+  "servers" : [ {
     "port" : "${TARGET_JMX_PORT}",
     "host" : "${TARGET_JMX_HOST}",
-    "queries" : [{
+    "queries" : [ {
       "outputWriters" : [ {
         "@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
         "url" : "${TARGET_INFLUXDB_URL}",
@@ -20,6 +20,6 @@
       "obj" : "Catalina:type=ThreadPool,name=*",
       "resultAlias" : "tomcat_threadpools",
       "attr" : ["connectionCount","maxConnections","acceptorThreadCount","backlog","currentThreadCount","currentThreadsBusy","maxSpareThreads","maxThreads","minSpareThreads"]
-    }]
-  }]
+    } ]
+  } ]
 }
