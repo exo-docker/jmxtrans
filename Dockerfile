@@ -5,7 +5,7 @@
 FROM    openjdk:8-jdk
 LABEL   maintainer="eXo Platform <docker@exoplatform.com>"
 
-ARG JMXTRANS_VERSION=265
+ARG JMXTRANS_VERSION=268
 ENV TINI_VERSION v0.14.0
 ENV GOSU_VERSION 1.10
 
@@ -33,17 +33,14 @@ RUN set -ex \
 
 # Installing Gosu
 RUN set -ex \
-    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
-	# verify the signature
-    && export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    # verify that the binary works
-    && gosu nobody true
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
+
+RUN set -ex \
+    && curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+    && curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+    && gpg --verify /usr/local/bin/gosu.asc \
+    && rm /usr/local/bin/gosu.asc \
+    && chmod +x /usr/local/bin/gosu
 
 # Installing JMXTrans
 RUN set -eux \

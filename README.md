@@ -8,8 +8,8 @@ This container aims to provide an out of the box tool to collect eXo Platform JM
 
 |    Image                          |  JMXTrans  |   eXo Platform    
 |-----------------------------------|------------|--------------------
-| exoplatform/jmxtrans:latest       |   265      |   4.4+
-| exoplatform/jmxtrans:develop      |   265      |   4.4+
+| exoplatform/jmxtrans:latest       |   268      |   4.4+
+| exoplatform/jmxtrans:develop      |   268      |   4.4+
 
 # Running
 
@@ -62,6 +62,21 @@ Several aspects of JMXTrans container are customizable with the following enviro
 | jvm_memory_pool | java.lang:name=*,type=MemoryPool 
 | jvm_system | java.lang:type=OperatingSystem 
 | jvm_threads| java.lang:type=Threading 
+| exo_caches | exo:portal=*,service=cache,name=*
+| exo_infinispan_idm | org.infinispan.plidm:type=Cache,name=*,manager=*,component=Statistics
+| exo_infinispan_idm_channel | org.infinispan.plidm:type=channel,cluster=*
+| exo_infinispan_idm_protocol | org.infinispan.plidm:type=protocol,cluster=*,protocol=TCP
+| exo_infinispan_idm_rpc | org.infinispan.plidm:type=Cache,name=*,manager=*,component=RpcManager
+| exo_infinispan_jcr | jcr.ispn.cache:type=Cache,name=*,manager=*,component=Statistics
+| exo_infinispan_jcr_channel | jcr.ispn.cache:type=channel,cluster=*
+| exo_infinispan_jcr_protocol | jcr.ispn.cache:type=protocol,cluster=*,protocol=TCP
+| exo_infinispan_jcr_rpc | jcr.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager
+| exo_infinispan_services | services.ispn.cache:type=Cache,name=*,manager=*,component=Statistics
+| exo_infinispan_services_channel | services.ispn.cache:type=channel,cluster=*
+| exo_infinispan_services_protocol | services.ispn.cache:type=protocol,cluster=*,protocol=TCP
+| exo_infinispan_services_rpc | services.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager
+| exo_jcr_cache | exo:portal=*,repository=*,workspace=*,service=Cache <br> exo:portal=*,repository=*,workspace=*,service=lockmanager
+| exo_jcr_session_registry | exo:portal=*,repository=*,service=SessionRegistry
 | tomcat_datasources | Catalina:type=DataSource,class=javax.sql.DataSource,name=\"*\"
 | tomcat_request_processor | Catalina:type=GlobalRequestProcessor,name=*
 | tomcat_http_sessions | Catalina:type=Manager,context=/*,host=*
