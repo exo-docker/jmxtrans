@@ -21,7 +21,7 @@
       } ],
       "obj" : "exo:portal=*,service=cache,name=*",
       "resultAlias" : "exo_cache",
-      "attr" : [ "Size", "MissCount", "HitCount", "Capacity", "TimeToLive","MaxEntries" ]
+      "attr" : [ "Size", "MissCount", "HitCount", "Capacity", "TimeToLive", "MaxEntries", "MaxNodes" ]
     } ]
   } ]
 }
