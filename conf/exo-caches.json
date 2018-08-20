@@ -2,6 +2,8 @@
   "servers" : [ {
     "port" : "${TARGET_JMX_PORT}",
     "host" : "${TARGET_JMX_HOST}",
+    "username" : "${TARGET_JMX_USER}",
+    "password" : "${TARGET_JMX_PASSWORD}",
     "queries" : [ {
       "outputWriters" : [ {
         "@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",

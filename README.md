@@ -42,6 +42,8 @@ Several aspects of JMXTrans container are customizable with the following enviro
 | HEAP_SIZE | NO | `512` | specify the jvm allocated memory size in MB (-Xms and -Xmx parameters)
 | TARGET_JMX_HOST | NO | `localhost` | the JMX hostname of the eXo Platform instance
 | TARGET_JMX_PORT | NO | `8004` | the JMX port of the eXo Platform instance
+| TARGET_JMX_USER | NO | `` | the JMX username of the eXo Platform instance
+| TARGET_JMX_PASSWORD | NO | `` | the JMX password of the eXo Platform instance
 | TARGET_HOSTNAME | NO | `same as $TARGET_JMX_HOST value` | the hostname of the eXo Platform server
 | TARGET_NODE_ID | NO | `NC` | a string to identify an eXo node in a cluster for exemple
 | TARGET_INFLUXDB_URL | NO | `http://localhost:8086` | the full url of the Influxdb server to send the metrics
