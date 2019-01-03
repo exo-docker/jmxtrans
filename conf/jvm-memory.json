@@ -13,7 +13,7 @@
         "retentionPolicy" : "${TARGET_INFLUXDB_RETENTION_POLICY}",
         "username" : "${TARGET_INFLUXDB_USERNAME}",
         "password" : "${TARGET_INFLUXDB_PASSWORD}",
-        "resultTags":["typeName","className"],
+        "resultTags":["typeName","className","attributeName"],
         "tags" : {
           "host" : "${TARGET_HOSTNAME}",
           "node" : "${TARGET_NODE_ID}"
