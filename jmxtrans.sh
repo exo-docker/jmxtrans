@@ -9,6 +9,8 @@ TARGET_JMX_HOST=${TARGET_JMX_HOST:-"localhost"}
 TARGET_JMX_PORT=${TARGET_JMX_PORT:-"8004"}
 TARGET_HOSTNAME=${TARGET_HOSTNAME:-$TARGET_JMX_HOST}
 TARGET_NODE_ID=${TARGET_NODE_ID:-"NC"}
+TARGET_JMX_USER=${TARGET_JMX_USER:-"nobody"}
+TARGET_JMX_PASSWORD=${TARGET_JMX_PASSWORD:-"nothing"}
 ## Influxdb Configuration
 TARGET_INFLUXDB_URL=${TARGET_INFLUXDB_URL:-"http://localhost:8086"}
 TARGET_INFLUXDB_DATABASE=${TARGET_INFLUXDB_DATABASE:-"exo"}
@@ -51,6 +53,7 @@ if [ "$1" != "bash" -a "$1" != "sh" ]; then
     echo "TARGET_JMX_PORT                   : ${TARGET_JMX_PORT}"
     echo "TARGET_HOSTNAME                   : ${TARGET_HOSTNAME}"
     echo "TARGET_NODE_ID                    : ${TARGET_NODE_ID}"
+    echo "TARGET_JMX_USER                   : ${TARGET_JMX_USER}"
     echo "TARGET_INFLUXDB_URL               : ${TARGET_INFLUXDB_URL}"
     echo "TARGET_INFLUXDB_DATABASE          : ${TARGET_INFLUXDB_DATABASE}"
     echo "TARGET_INFLUXDB_USERNAME          : ${TARGET_INFLUXDB_USERNAME}"
