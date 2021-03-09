@@ -5,9 +5,9 @@
 FROM    openjdk:8-jdk
 LABEL   maintainer="eXo Platform <docker@exoplatform.com>"
 
-ARG JMXTRANS_VERSION=268
-ENV TINI_VERSION v0.14.0
-ENV GOSU_VERSION 1.10
+ARG JMXTRANS_VERSION=271
+ENV TINI_VERSION v0.19.0
+ENV GOSU_VERSION 1.12
 
 ENV TERM=xterm \
     # Local
@@ -31,6 +31,7 @@ RUN set -ex \
         || gpg --batch --keyserver pool.sks-keyservers.net  --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver pgp.mit.edu              --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver keyserver.pgp.com        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
+        || gpg --batch --keyserver p80.pool.sks-keyservers.net --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
     )
 
 RUN set -ex \
@@ -47,6 +48,7 @@ RUN set -ex \
         || gpg --batch --keyserver pool.sks-keyservers.net  --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver pgp.mit.edu              --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver keyserver.pgp.com        --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+        || gpg --batch --keyserver keys.openpgp.org         --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     )
 
 RUN set -ex \
@@ -58,9 +60,9 @@ RUN set -ex \
 
 # Installing JMXTrans
 RUN set -eux \
-    echo "Downloading http://central.maven.org/maven2/org/jmxtrans/jmxtrans/${JMXTRANS_VERSION}/jmxtrans-${JMXTRANS_VERSION}-all.jar" \
+    echo "Downloading https://repo.maven.apache.org/maven2/org/jmxtrans/jmxtrans/${JMXTRANS_VERSION}/jmxtrans-${JMXTRANS_VERSION}-all.jar" \
     && mkdir -p "${JMXTRANS_APP_DIR}" \
-    && curl -Lo "${JMXTRANS_APP_DIR}/${JMXTRANS_JAR_FILE}" "http://central.maven.org/maven2/org/jmxtrans/jmxtrans/${JMXTRANS_VERSION}/jmxtrans-${JMXTRANS_VERSION}-all.jar" \
+    && curl -Lo "${JMXTRANS_APP_DIR}/${JMXTRANS_JAR_FILE}" "https://repo.maven.apache.org/maven2/org/jmxtrans/jmxtrans/${JMXTRANS_VERSION}/jmxtrans-${JMXTRANS_VERSION}-all.jar" \
     && mkdir -p ${LOG_DIR} \
     && rm -rf /tmp/*
 
