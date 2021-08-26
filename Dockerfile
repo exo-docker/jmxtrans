@@ -2,12 +2,12 @@
 # source: http://heiber.im/post/creating-a-solid-docker-base-image/
 #
 # build: docker build -t exoplatform/jmxtrans:latest .
-FROM    openjdk:8-jdk
+FROM    openjdk:11-jdk
 LABEL   maintainer="eXo Platform <docker@exoplatform.com>"
 
-ARG JMXTRANS_VERSION=271
+ARG JMXTRANS_VERSION=272
 ENV TINI_VERSION v0.19.0
-ENV GOSU_VERSION 1.12
+ENV GOSU_VERSION 1.13
 
 ENV TERM=xterm \
     # Local
