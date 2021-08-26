@@ -26,9 +26,7 @@ WORKDIR /tmp
 # Installing Tini
 RUN set -ex \
     && ( \
-        gpg --batch --keyserver ipv4.pool.sks-keyservers.net  --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver ha.pool.sks-keyservers.net  --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver pool.sks-keyservers.net  --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
+        gpg --batch --keyserver pgp.key-server.io        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver pgp.mit.edu              --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver keyserver.pgp.com        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver p80.pool.sks-keyservers.net --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
@@ -43,9 +41,7 @@ RUN set -ex \
 # Installing Gosu
 RUN set -ex \
     && ( \
-        gpg --batch --keyserver ipv4.pool.sks-keyservers.net  --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-        || gpg --batch --keyserver ha.pool.sks-keyservers.net  --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-        || gpg --batch --keyserver pool.sks-keyservers.net  --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+        gpg --batch --keyserver pgp.key-server.io           --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver pgp.mit.edu              --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver keyserver.pgp.com        --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver keys.openpgp.org         --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
