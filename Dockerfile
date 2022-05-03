@@ -26,7 +26,9 @@ WORKDIR /tmp
 # Installing Tini
 RUN set -ex \
     && ( \
-        gpg --batch --keyserver pgp.key-server.io        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
+        gpg --batch --keyserver ha.pool.sks-keyservers.net  --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
+        || gpg --batch --keyserver keyserver.ubuntu.com     --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
+        || gpg --batch --keyserver pgp.key-server.io        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver pgp.mit.edu              --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver keyserver.pgp.com        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
         || gpg --batch --keyserver p80.pool.sks-keyservers.net --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
@@ -63,7 +65,7 @@ RUN set -eux \
     && rm -rf /tmp/*
 
 COPY jmxtrans.sh ${JMXTRANS_APP_DIR}/jmxtrans.sh
-COPY log4j.xml ${JMXTRANS_APP_DIR}/log4j.xml
+COPY logback.xml ${JMXTRANS_APP_DIR}/logback.xml
 COPY conf/ ${JMXTRANS_JSON_DIR}
 
 RUN chmod +x ${JMXTRANS_APP_DIR}/jmxtrans.sh
