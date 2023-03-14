@@ -44,6 +44,7 @@ RUN set -ex \
 RUN set -ex \
     && ( \
         gpg --batch --keyserver pgp.key-server.io           --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+        || gpg --batch --keyserver keyserver.ubuntu.com     --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver pgp.mit.edu              --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver keyserver.pgp.com        --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver keys.openpgp.org         --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
@@ -71,4 +72,5 @@ COPY conf/ ${JMXTRANS_JSON_DIR}
 RUN chmod +x ${JMXTRANS_APP_DIR}/jmxtrans.sh
 
 ENTRYPOINT ["/usr/local/bin/tini", "--"]
+HEALTHCHECK CMD curl --fail ${TARGET_INFLUXDB_URL:-"http://localhost:8086"}/ping && timeout 2 /bin/bash -c "</dev/tcp/${TARGET_JMX_HOST:-localhost}/${TARGET_JMX_PORT:-8004}" || exit 1
 CMD ["/opt/jmxtrans/jmxtrans.sh", "start", "/etc/jmxtrans"]
