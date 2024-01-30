@@ -2,12 +2,19 @@
 # source: http://heiber.im/post/creating-a-solid-docker-base-image/
 #
 # build: docker build -t exoplatform/jmxtrans:latest .
-FROM    openjdk:11-jdk
+FROM    eclipse-temurin:11-jdk-alpine
 LABEL   maintainer="eXo Platform <docker@exoplatform.com>"
 
 ARG JMXTRANS_VERSION=272
-ENV TINI_VERSION v0.19.0
-ENV GOSU_VERSION 1.13
+ENV GOSU_VERSION 1.17
+
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache --virtual .gosu-deps \
+		dpkg \
+        ca-certificates \
+		gnupg && \
+    apk add --no-cache tini curl libstdc++ gcompat bash
 
 ENV TERM=xterm \
     # Local
@@ -23,36 +30,16 @@ ENV TERM=xterm \
 
 WORKDIR /tmp
 
-# Installing Tini
-RUN set -ex \
-    && ( \
-        gpg --batch --keyserver ha.pool.sks-keyservers.net  --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver keyserver.ubuntu.com     --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver pgp.key-server.io        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver pgp.mit.edu              --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver keyserver.pgp.com        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver p80.pool.sks-keyservers.net --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-    )
-
-RUN set -ex \
-    && wget -O /usr/local/bin/tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini \
-    && wget -O /usr/local/bin/tini.asc https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc \
-    && gpg --verify /usr/local/bin/tini.asc \
-    && chmod +x /usr/local/bin/tini
-
 # Installing Gosu
 RUN set -ex \
-    && ( \
-        gpg --batch --keyserver pgp.key-server.io           --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-        || gpg --batch --keyserver keyserver.ubuntu.com     --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-        || gpg --batch --keyserver pgp.mit.edu              --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+    && ( gpg --batch --keyserver keyserver.ubuntu.com     --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver keyserver.pgp.com        --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
         || gpg --batch --keyserver keys.openpgp.org         --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     )
 
 RUN set -ex \
-    && curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+    && curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+    && curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
     && gpg --verify /usr/local/bin/gosu.asc \
     && rm /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu
@@ -65,12 +52,15 @@ RUN set -eux \
     && mkdir -p ${LOG_DIR} \
     && rm -rf /tmp/*
 
+# Cleanup
+RUN apk del --no-network .gosu-deps
+
 COPY jmxtrans.sh ${JMXTRANS_APP_DIR}/jmxtrans.sh
 COPY logback.xml ${JMXTRANS_APP_DIR}/logback.xml
 COPY conf/ ${JMXTRANS_JSON_DIR}
 
 RUN chmod +x ${JMXTRANS_APP_DIR}/jmxtrans.sh
 
-ENTRYPOINT ["/usr/local/bin/tini", "--"]
+ENTRYPOINT ["/sbin/tini", "--"]
 HEALTHCHECK CMD curl --fail ${TARGET_INFLUXDB_URL:-"http://localhost:8086"}/ping && timeout 2 /bin/bash -c "</dev/tcp/${TARGET_JMX_HOST:-localhost}/${TARGET_JMX_PORT:-8004}" || exit 1
 CMD ["/opt/jmxtrans/jmxtrans.sh", "start", "/etc/jmxtrans"]
