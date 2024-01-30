@@ -6,7 +6,6 @@ FROM    eclipse-temurin:11-jdk-alpine
 LABEL   maintainer="eXo Platform <docker@exoplatform.com>"
 
 ARG JMXTRANS_VERSION=272
-ENV TINI_VERSION v0.19.0
 ENV GOSU_VERSION 1.17
 
 RUN apk update && \
@@ -30,21 +29,6 @@ ENV TERM=xterm \
     PATH=${PATH}:/opt
 
 WORKDIR /tmp
-
-# Installing Tini
-RUN set -ex \
-    && ( \
-        gpg --batch --keyserver ha.pool.sks-keyservers.net  --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver keyserver.ubuntu.com     --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver pgp.key-server.io        --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-        || gpg --batch --keyserver p80.pool.sks-keyservers.net --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-    )
-
-RUN set -ex \
-    && wget -O /usr/local/bin/tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini \
-    && wget -O /usr/local/bin/tini.asc https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc \
-    && gpg --verify /usr/local/bin/tini.asc \
-    && chmod +x /usr/local/bin/tini
 
 # Installing Gosu
 RUN set -ex \
