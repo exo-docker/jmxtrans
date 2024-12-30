@@ -27,6 +27,7 @@ JMXTRANS_LOG_LEVEL=${JMXTRANS_LOG_LEVEL:-"WARN"} # [DEBUG|INFO|WARN|ERROR|FATAL]
 ######################################
 
 JMXTRANS_OPTS="${JMXTRANS_OPTS:-} -Duser.language=en -Duser.region=EN" # Always use the same Locale (en_EN) is a good practice to avoid localization problems between different servers
+JMXTRANS_OPTS="${JMXTRANS_OPTS:-} --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.management/javax.management=ALL-UNNAMED" # Suppress the warning : Illegal reflective access
 JMXTRANS_OPTS="${JMXTRANS_OPTS} -DTARGET_JMX_HOST=${TARGET_JMX_HOST} -DTARGET_JMX_PORT=${TARGET_JMX_PORT}"
 JMXTRANS_OPTS="${JMXTRANS_OPTS} -DTARGET_JMX_USER=${TARGET_JMX_USER} -DTARGET_JMX_PASSWORD=${TARGET_JMX_PASSWORD}"
 JMXTRANS_OPTS="${JMXTRANS_OPTS} -DTARGET_INFLUXDB_URL=${TARGET_INFLUXDB_URL} -DTARGET_INFLUXDB_DATABASE=${TARGET_INFLUXDB_DATABASE}"
