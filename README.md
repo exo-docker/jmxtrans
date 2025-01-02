@@ -12,6 +12,7 @@ This container aims to provide an out of the box tool to collect eXo Platform JM
 | exoplatform/jmxtrans:develop      |   268      |   4.4+
 | exoplatform/jmxtrans:268_0        |   268      |   4.4+
 | exoplatform/jmxtrans:268_1        |   268      |   5.1+
+| exoplatform/jmxtrans:272_4        |   272      |   6.2+
 
 
 # Running
