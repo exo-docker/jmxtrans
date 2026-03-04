@@ -8,12 +8,11 @@ FROM azul/zulu-openjdk-alpine:11-jre-headless-latest AS builder
 LABEL maintainer="eXo Platform <docker@exoplatform.com>"
 
 ARG JMXTRANS_VERSION=272
-ENV GOSU_VERSION=1.17
+ENV GOSU_VERSION=1.19-go1.24.13
 
 RUN apk add --no-cache --virtual .build-deps \
     dpkg \
     ca-certificates \
-    gnupg \
     curl \
     && apk add --no-cache libstdc++ gcompat bash
 
@@ -21,12 +20,7 @@ WORKDIR /build
 
 # Install Gosu
 RUN set -ex \
-    && ( gpg --batch --keyserver keyserver.ubuntu.com     --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    || gpg --batch --keyserver keyserver.pgp.com        --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    || gpg --batch --keyserver keys.openpgp.org         --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 ) \
-    && curl -o gosu -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-    && curl -o gosu.asc -SL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
-    && gpg --verify gosu.asc \
+    && curl -o gosu -SL "https://github.com/questdb/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
     && chmod +x gosu
 
 # Install JMXTrans
