@@ -6,18 +6,11 @@
     "password" : "${TARGET_JMX_PASSWORD}",
     "queries" : [ {
       "outputWriters" : [ {
-        "@class" : "com.googlecode.jmxtrans.model.output.InfluxDbWriterFactory",
-        "url" : "${TARGET_INFLUXDB_URL}",
-        "database" : "${TARGET_INFLUXDB_DATABASE}",
-        "createDatabase" : "${TARGET_INFLUXDB_CREATE_DB}",
-        "retentionPolicy" : "${TARGET_INFLUXDB_RETENTION_POLICY}",
-        "username" : "${TARGET_INFLUXDB_USERNAME}",
-        "password" : "${TARGET_INFLUXDB_PASSWORD}",
-        "resultTags":["typeName","className"],
-        "tags" : {
-          "host" : "${TARGET_HOSTNAME}",
-          "node" : "${TARGET_NODE_ID}"
-        }
+        "@class" : "com.googlecode.jmxtrans.model.output.GraphiteWriterFactory",
+        "host" : "${TARGET_GRAPHITE_HOST}",
+        "port" : "${TARGET_GRAPHITE_PORT}",
+        "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
+        "typeNames" : ["typeName","className"]
       } ],
       "obj" : "Catalina:type=Manager,context=/*,host=*",
       "resultAlias" : "tomcat_http_sessions",

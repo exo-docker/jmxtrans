@@ -1,98 +1,111 @@
-# JMXTrans docker container for eXo
+# JMXTrans for eXo Platform
 
-This container aims to provide an out of the box tool to collect eXo Platform JMX metrics and to push it in an Influxdb server.
-
-# eXo Platform Docker image
+Collects eXo Platform JMX metrics into InfluxDB v2 via a **JMXTrans → Graphite → Telegraf → InfluxDB v2** pipeline.
 
 [![Docker Stars](https://img.shields.io/docker/stars/exoplatform/jmxtrans.svg)]() - [![Docker Pulls](https://img.shields.io/docker/pulls/exoplatform/jmxtrans.svg)]()
 
-|    Image                          |  JMXTrans  |   eXo Platform    
-|-----------------------------------|------------|--------------------
-| exoplatform/jmxtrans:latest       |   268      |   4.4+
-| exoplatform/jmxtrans:develop      |   268      |   4.4+
-| exoplatform/jmxtrans:268_0        |   268      |   4.4+
-| exoplatform/jmxtrans:268_1        |   268      |   5.1+
-| exoplatform/jmxtrans:272_4        |   272      |   6.2+
-
-
-# Running
-
-Just launch the image with default values :
+## Architecture
 
 ```
-docker run exoplatform/jmxtrans 
+eXo Platform (JMX RMI)
+        │
+        ▼
+    JMXTrans ──Graphite──▶ Telegraf ──Line Protocol──▶ InfluxDB v2 ──▶ Grafana
 ```
 
-If you want to specify the targeted Influxdb server :
+- **JMXTrans** connects to the eXo JVM via JMX RMI and sends metrics as Graphite plaintext
+- **Telegraf** receives Graphite metrics and forwards them to InfluxDB v2
+- **InfluxDB v2** stores time-series data
+- **Grafana** visualizes dashboards
 
+## Image Tags
+
+| Image | JMXTrans | eXo Platform |
+|-------|----------|--------------|
+| exoplatform/jmxtrans:latest | 272 | 4.4+ |
+| exoplatform/jmxtrans:develop | 272 | 4.4+ |
+| exoplatform/jmxtrans:272_4 | 272 | 6.2+ |
+
+## Running
+
+Standalone container:
+
+```bash
+docker run -e TARGET_JMX_HOST=exo.server.org \
+           -e TARGET_GRAPHITE_HOST=telegraf.server.org \
+           exoplatform/jmxtrans
 ```
-docker run -e TARGET_INFLUXDB_URL="http://influxdb.server.org" exoplatform/jmxtrans 
+
+Full monitoring stack:
+
+```bash
+cp test/.env.example test/.env
+docker compose -f test/docker-compose.yml -p jmx up -d
 ```
 
-or the eXo Platform server hostname :
+Access Grafana at `http://localhost:3000` (default: admin/admin).
 
-```
-docker run -e TARGET_JMX_HOST=exo.server.org exoplatform/jmxtrans 
-```
+## Configuration
 
-For more configuration settings, see the next section.
+### JMXTrans Environment Variables
 
-# Configuration options
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `HEAP_SIZE` | `512` | JVM heap size in MB |
+| `TARGET_JMX_HOST` | `localhost` | eXo JMX hostname |
+| `TARGET_JMX_PORT` | `8004` | eXo JMX port |
+| `TARGET_JMX_USER` | | JMX username |
+| `TARGET_JMX_PASSWORD` | | JMX password |
+| `TARGET_HOSTNAME` | same as `TARGET_JMX_HOST` | Hostname label in metrics |
+| `TARGET_NODE_ID` | `NC` | Cluster node identifier |
+| `TARGET_GRAPHITE_HOST` | `localhost` | Telegraf/Graphite target host |
+| `TARGET_GRAPHITE_PORT` | `2003` | Telegraf/Graphite target port |
+| `TARGET_GRAPHITE_ROOT_PREFIX` | `jmxtrans.<host>.<node>` | Metric path prefix |
+| `JMXTRANS_POOLING_FREQUENCY` | `30` | Collection interval in seconds |
+| `JMXTRANS_LOG_LEVEL` | `WARN` | Log level (DEBUG/INFO/WARN/ERROR) |
 
-Several aspects of JMXTrans container are customizable with the following environment variables:
+### InfluxDB v2 Environment Variables (docker-compose)
 
-|    VARIABLE              |  MANDATORY  |   DEFAULT VALUE          |  DESCRIPTION
-|--------------------------|-------------|--------------------------|----------------
-| HEAP_SIZE | NO | `512` | specify the jvm allocated memory size in MB (-Xms and -Xmx parameters)
-| TARGET_JMX_HOST | NO | `localhost` | the JMX hostname of the eXo Platform instance
-| TARGET_JMX_PORT | NO | `8004` | the JMX port of the eXo Platform instance
-| TARGET_JMX_USER | NO | `` | the JMX username of the eXo Platform instance
-| TARGET_JMX_PASSWORD | NO | `` | the JMX password of the eXo Platform instance
-| TARGET_HOSTNAME | NO | `same as $TARGET_JMX_HOST value` | the hostname of the eXo Platform server
-| TARGET_NODE_ID | NO | `NC` | a string to identify an eXo node in a cluster for exemple
-| TARGET_INFLUXDB_URL | NO | `http://localhost:8086` | the full url of the Influxdb server to send the metrics
-| TARGET_INFLUXDB_DATABASE | NO | `exo` | the Influxdb database name to use
-| TARGET_INFLUXDB_USERNAME | NO | `nobody` | the Influxdb username
-| TARGET_INFLUXDB_PASSWORD | NO | `nothing` | the Influxdb password
-| TARGET_INFLUXDB_CREATE_DB | NO | `true` | does JMXTrans create the Influxdb database if needed
-| TARGET_INFLUXDB_RETENTION_POLICY | NO | `autogen` | the Influxdb rentention policy name to use
-| JMXTRANS_POOLING_FREQUENCY | NO | `30` | the JMXTrans pooling frequency in seconds
-| JMXTRANS_LOG_LEVEL | NO | `WARN` | the JMXTrans logging level (DEBUG|INFO|WARN|ERROR|FATAL)
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `INFLUXDB_ADMIN_USER` | `admin` | InfluxDB admin username |
+| `INFLUXDB_ADMIN_PASSWORD` | `admin1234` | InfluxDB admin password |
+| `INFLUXDB_ORG` | `exo` | InfluxDB organization |
+| `INFLUXDB_BUCKET` | `exo` | InfluxDB bucket |
+| `INFLUXDB_TOKEN` | `exo-influxdb-token` | InfluxDB API token |
 
-# Collected metrics
+### Grafana (docker-compose)
 
-| Influxdb Measurement | MBeans 
-|----------------------|--------
-| jvm_gc | java.lang:type=GarbageCollector,name=* 
-| jvm_memory_heap | java.lang:type=Memory 
-| jvm_memory_pool | java.lang:name=*,type=MemoryPool 
-| jvm_system | java.lang:type=OperatingSystem 
-| jvm_threads| java.lang:type=Threading 
-| exo_caches | exo:portal=*,service=cache,name=*
-| exo_infinispan_idm | org.infinispan.plidm:type=Cache,name=*,manager=*,component=Statistics
-| exo_infinispan_idm_channel | org.infinispan.plidm:type=channel,cluster=*
-| exo_infinispan_idm_protocol | org.infinispan.plidm:type=protocol,cluster=*,protocol=TCP
-| exo_infinispan_idm_rpc | org.infinispan.plidm:type=Cache,name=*,manager=*,component=RpcManager
-| exo_infinispan_jcr | jcr.ispn.cache:type=Cache,name=*,manager=*,component=Statistics
-| exo_infinispan_jcr_channel | jcr.ispn.cache:type=channel,cluster=*
-| exo_infinispan_jcr_protocol | jcr.ispn.cache:type=protocol,cluster=*,protocol=TCP
-| exo_infinispan_jcr_rpc | jcr.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager
-| exo_infinispan_services | services.ispn.cache:type=Cache,name=*,manager=*,component=Statistics
-| exo_infinispan_services_channel | services.ispn.cache:type=channel,cluster=*
-| exo_infinispan_services_protocol | services.ispn.cache:type=protocol,cluster=*,protocol=TCP
-| exo_infinispan_services_rpc | services.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager
-| exo_jcr_cache | exo:portal=*,repository=*,workspace=*,service=Cache <br> exo:portal=*,repository=*,workspace=*,service=lockmanager
-| exo_jcr_session_registry | exo:portal=*,repository=*,service=SessionRegistry
-| tomcat_datasources | Catalina:type=DataSource,class=javax.sql.DataSource,name=\"*\"
-| tomcat_request_processor | Catalina:type=GlobalRequestProcessor,name=*
-| tomcat_http_sessions | Catalina:type=Manager,context=/*,host=*
-| tomcat_threadpools | Catalina:type=ThreadPool,name=*
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `GRAFANA_ADMIN_USER` | `admin` | Grafana admin username |
+| `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana admin password |
 
+## Collected Metrics
 
-# Testing
-
-A docker-compose file is provided to test a full monitoring stack with eXo Platform Community edition
-
-```
-docker-compose -f test/docker-compose.yml -p jmx up -d
-```
+| Measurement | MBean |
+|-------------|-------|
+| `jvm_gc` | `java.lang:type=GarbageCollector,name=*` |
+| `jvm_memory_heap` | `java.lang:type=Memory` |
+| `jvm_memory_pool` | `java.lang:name=*,type=MemoryPool` |
+| `jvm_system` | `java.lang:type=OperatingSystem` |
+| `jvm_threads` | `java.lang:type=Threading` |
+| `exo_cache` | `exo:portal=*,service=cache,name=*` |
+| `exo_infinispan_idm` | `org.infinispan.plidm:type=Cache,name=*,manager=*,component=Statistics` |
+| `exo_infinispan_idm_channel` | `org.infinispan.plidm:type=channel,cluster=*` |
+| `exo_infinispan_idm_protocol` | `org.infinispan.plidm:type=protocol,cluster=*,protocol=TCP` |
+| `exo_infinispan_idm_rpc` | `org.infinispan.plidm:type=Cache,name=*,manager=*,component=RpcManager` |
+| `exo_infinispan_jcr` | `jcr.ispn.cache:type=Cache,name=*,manager=*,component=Statistics` |
+| `exo_infinispan_jcr_channel` | `jcr.ispn.cache:type=channel,cluster=*` |
+| `exo_infinispan_jcr_protocol` | `jcr.ispn.cache:type=protocol,cluster=*,protocol=TCP` |
+| `exo_infinispan_jcr_rpc` | `jcr.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager` |
+| `exo_infinispan_services` | `services.ispn.cache:type=Cache,name=*,manager=*,component=Statistics` |
+| `exo_infinispan_services_channel` | `services.ispn.cache:type=channel,cluster=*` |
+| `exo_infinispan_services_protocol` | `services.ispn.cache:type=protocol,cluster=*,protocol=TCP` |
+| `exo_infinispan_services_rpc` | `services.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager` |
+| `exo_jcr_cache` | `exo:portal=*,repository=*,workspace=*,service=Cache` / `service=lockmanager` |
+| `exo_jcr_session_registry` | `exo:portal=*,repository=*,service=SessionRegistry` |
+| `tomcat_datasources` | `Catalina:type=DataSource,class=javax.sql.DataSource,name="*"` |
+| `tomcat_request_processor` | `Catalina:type=GlobalRequestProcessor,name=*` |
+| `tomcat_http_sessions` | `Catalina:type=Manager,context=/*,host=*` |
+| `tomcat_threadpools` | `Catalina:type=ThreadPool,name=*` |

@@ -1,52 +1,88 @@
-version: '2'
+version: '3.8'
 services:
-  jmxtrans:
-    image: exoplatform/jmxtrans
-    environment: 
-      TARGET_JMX_HOST: exo
-      TARGET_HOSTNAME: exo
-      TARGET_JMX_PORT: 10001
-      TARGET_INFLUXDB_URL: http://influxdb:8086
-      JMXTRANS_LOG_LEVEL: debug
-      TARGET_INFLUXDB_CREATE_DB: "true"
-    links:
-      - exo
-      - influxdb
-    volumes:
-      - jmxtrans_logs:/var/log/jmxtrans
-    depends_on: 
-      - exo
-      - influxdb
+  # === InfluxDB v2 ===
   influxdb:
-    image: influxdb:1.4-alpine
+    image: influxdb:2
+    container_name: jmx_influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_ADMIN_USER:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD:-admin1234}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG:-exo}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET:-exo}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-exo-influxdb-token}
     volumes:
-      - influxdb_data:/var/lib/influxdb
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # === Telegraf (Graphite input → InfluxDB v2 output) ===
+  telegraf:
+    image: telegraf:latest
+    container_name: jmx_telegraf
+    environment:
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-exo-influxdb-token}
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-exo}
+      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-exo}
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # === Grafana ===
   grafana:
-    image: grafana/grafana:4.6.2
-    environment: 
-      GF_PATHS_DATA: /var/lib/grafana
+    image: grafana/grafana:latest
+    container_name: jmx_grafana
+    environment:
       GF_SERVER_HTTP_PORT: 3000
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
     ports:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-    depends_on: 
+    depends_on:
       - influxdb
+    restart: unless-stopped
+
+  # === JMXTrans (JMX RMI → Graphite) ===
+  jmxtrans:
+    image: exoplatform/jmxtrans
+    container_name: jmx_jmxtrans
+    environment:
+      TARGET_JMX_HOST: ${TARGET_JMX_HOST:-exo}
+      TARGET_JMX_PORT: ${TARGET_JMX_PORT:-10001}
+      TARGET_HOSTNAME: ${TARGET_HOSTNAME:-exo}
+      TARGET_NODE_ID: ${TARGET_NODE_ID:-NC}
+      TARGET_GRAPHITE_HOST: telegraf
+      TARGET_GRAPHITE_PORT: "2003"
+      JMXTRANS_LOG_LEVEL: ${JMXTRANS_LOG_LEVEL:-debug}
+    volumes:
+      - jmxtrans_logs:/var/log/jmxtrans
+    depends_on:
+      - telegraf
+    restart: unless-stopped
+
+  # === eXo Platform ===
   exo:
     image: exoplatform/exo-community
+    container_name: jmx_exo
     ports:
       - "8080:8080"
-    expose:
-      - "8080"
     environment:
       EXO_DB_TYPE: mysql
       EXO_DB_NAME: exo
       EXO_DB_USER: exo
       EXO_DB_PASSWORD: exo
       EXO_DB_HOST: db
-      EXO_ADDONS_LIST: 
+      EXO_ADDONS_LIST:
       EXO_ES_EMBEDDED: "true"
-      #EXO_ES_HOST: search
       EXO_PROXY_VHOST: localhost
       EXO_PROXY_SSL: "false"
       EXO_JVM_SIZE_MIN: "2g"
@@ -56,20 +92,18 @@ services:
       EXO_JMX_RMI_REGISTRY_PORT: 10001
       EXO_JMX_RMI_SERVER_PORT: 10002
       EXO_JMX_RMI_SERVER_HOSTNAME: exo
-    links:
-      - db
     depends_on:
       - db
       - mail
     volumes:
       - exo_data:/srv
       - exo_logs:/var/log/exo
-  mongo:
-    image: mongo:3.4
-    volumes:
-      - mongo_data:/data/db:rw
+    restart: unless-stopped
+
+  # === MySQL ===
   db:
-    image: mysql:5.6
+    image: mysql:5.7
+    container_name: jmx_db
     environment:
       MYSQL_ROOT_PASSWORD: my-secret-pw
       MYSQL_DATABASE: exo
@@ -77,8 +111,20 @@ services:
       MYSQL_PASSWORD: exo
     volumes:
       - db_data:/var/lib/mysql:rw
+    restart: unless-stopped
+
+  # === MongoDB (for MailHog) ===
+  mongo:
+    image: mongo:4.4
+    container_name: jmx_mongo
+    volumes:
+      - mongo_data:/data/db:rw
+    restart: unless-stopped
+
+  # === MailHog ===
   mail:
     image: mailhog/mailhog
+    container_name: jmx_mail
     environment:
       MH_SMTP_BIND_ADDR: 0.0.0.0:1025
       MH_STORAGE: mongodb
@@ -88,8 +134,11 @@ services:
       MH_UI_WEB_PATH: mail
     depends_on:
       - mongo
+    restart: unless-stopped
+
 volumes:
   influxdb_data:
+  influxdb_config:
   grafana_data:
   exo_data:
   exo_logs:
