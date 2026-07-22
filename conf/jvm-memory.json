@@ -10,7 +10,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className","attributeName"]
+        "typeNames" : []
       } ],
       "obj" : "java.lang:type=Memory",
       "resultAlias" : "jvm_memory_heap",
@@ -21,7 +21,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "java.lang:name=*,type=MemoryPool",
       "resultAlias" : "jvm_memory_pool",

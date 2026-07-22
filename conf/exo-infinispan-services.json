@@ -10,7 +10,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "services.ispn.cache:type=Cache,name=*,manager=*,component=Statistics",
       "resultAlias" : "exo_infinispan_services",
@@ -21,7 +21,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "services.ispn.cache:type=Cache,name=*,manager=*,component=RpcManager",
       "resultAlias" : "exo_infinispan_services_rpc",
@@ -32,7 +32,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "services.ispn.cache:type=channel,cluster=*",
       "resultAlias" : "exo_infinispan_services_channel",
@@ -43,7 +43,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "services.ispn.cache:type=protocol,cluster=*,protocol=TCP",
       "resultAlias" : "exo_infinispan_services_protocol",

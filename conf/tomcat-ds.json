@@ -10,7 +10,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "Catalina:type=DataSource,class=javax.sql.DataSource,name=\"*\"",
       "resultAlias" : "tomcat_datasources",

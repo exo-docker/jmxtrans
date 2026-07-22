@@ -10,7 +10,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "exo:portal=*,repository=*,workspace=*,service=Cache",
       "resultAlias" : "exo_jcr_cache",
@@ -21,7 +21,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "exo:portal=*,repository=*,workspace=*,service=lockmanager",
       "resultAlias" : "exo_jcr_cache",
@@ -32,7 +32,7 @@
         "host" : "${TARGET_GRAPHITE_HOST}",
         "port" : "${TARGET_GRAPHITE_PORT}",
         "rootPrefix" : "${TARGET_GRAPHITE_ROOT_PREFIX}",
-        "typeNames" : ["typeName","className"]
+        "typeNames" : []
       } ],
       "obj" : "exo:portal=*,repository=*,service=SessionRegistry",
       "resultAlias" : "exo_jcr_session_registry",
