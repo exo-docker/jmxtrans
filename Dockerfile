@@ -8,7 +8,7 @@ FROM azul/zulu-openjdk-alpine:11-jre-headless-latest AS builder
 LABEL maintainer="eXo Platform <docker@exoplatform.com>"
 
 ARG JMXTRANS_VERSION=272
-ENV GOSU_VERSION=1.19-go1.24.13
+ENV GOSU_VERSION=1.19-go1.25.13
 
 RUN apk add --no-cache --virtual .build-deps \
     dpkg \
