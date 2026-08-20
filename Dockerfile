@@ -60,5 +60,5 @@ RUN chmod +x ./jmxtrans.sh \
     && chown -R nobody:nogroup ${JMXTRANS_LOG_DIR}
 
 ENTRYPOINT ["/sbin/tini", "--"]
-HEALTHCHECK CMD curl --fail ${TARGET_INFLUXDB_URL:-"http://localhost:8086"}/ping && timeout 2 /bin/bash -c "</dev/tcp/${TARGET_JMX_HOST:-localhost}/${TARGET_JMX_PORT:-8004}" || exit 1
+HEALTHCHECK CMD timeout 2 /bin/bash -c "</dev/tcp/${TARGET_JMX_HOST:-localhost}/${TARGET_JMX_PORT:-8004}" || exit 1
 CMD ["/opt/jmxtrans/jmxtrans.sh", "start", "/etc/jmxtrans"]
