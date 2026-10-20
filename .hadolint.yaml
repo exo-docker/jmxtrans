@@ -1,0 +1,3 @@
+ignored:
+  - DL3018  # alpine package versions drift with the pinned base image digest, which Dependabot bumps
+  - DL4006  # the only pipe is `echo | sha256sum -c`, pipefail adds nothing
