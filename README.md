@@ -2,17 +2,18 @@
 
 This container aims to provide an out of the box tool to collect eXo Platform JMX metrics and to push it in an Influxdb server.
 
-# eXo Platform Docker image
+# Image tags
 
 [![Docker Stars](https://img.shields.io/docker/stars/exoplatform/jmxtrans.svg)]() - [![Docker Pulls](https://img.shields.io/docker/pulls/exoplatform/jmxtrans.svg)]()
 
-|    Image                          |  JMXTrans  |   eXo Platform    
-|-----------------------------------|------------|--------------------
-| exoplatform/jmxtrans:latest       |   268      |   4.4+
-| exoplatform/jmxtrans:develop      |   268      |   4.4+
-| exoplatform/jmxtrans:268_0        |   268      |   4.4+
-| exoplatform/jmxtrans:268_1        |   268      |   5.1+
-| exoplatform/jmxtrans:272_4        |   272      |   6.2+
+|    Image                          |  JMXTrans  |   Java  |   eXo Platform
+|-----------------------------------|------------|---------|--------------------
+| exoplatform/jmxtrans:latest       |   272      |   17    |   6.2+
+| exoplatform/jmxtrans:272_N        |   272      |   17    |   6.2+ (`272_4` to `272_7` ran on Java 11)
+| exoplatform/jmxtrans:268_1        |   268      |   11    |   5.1+
+| exoplatform/jmxtrans:268_0        |   268      |   11    |   4.4+
+
+The `latest` tag is rebuilt on every push to `master`; versioned tags are published from `N_M` git tags.
 
 
 # Running
@@ -46,8 +47,8 @@ Several aspects of JMXTrans container are customizable with the following enviro
 | HEAP_SIZE | NO | `512` | specify the jvm allocated memory size in MB (-Xms and -Xmx parameters)
 | TARGET_JMX_HOST | NO | `localhost` | the JMX hostname of the eXo Platform instance
 | TARGET_JMX_PORT | NO | `8004` | the JMX port of the eXo Platform instance
-| TARGET_JMX_USER | NO | `` | the JMX username of the eXo Platform instance
-| TARGET_JMX_PASSWORD | NO | `` | the JMX password of the eXo Platform instance
+| TARGET_JMX_USER | NO | `nobody` | the JMX username of the eXo Platform instance (a dummy value is needed because the JSON configs reference it; it is ignored when the target has no JMX authentication)
+| TARGET_JMX_PASSWORD | NO | `nothing` | the JMX password of the eXo Platform instance
 | TARGET_HOSTNAME | NO | `same as $TARGET_JMX_HOST value` | the hostname of the eXo Platform server
 | TARGET_NODE_ID | NO | `NC` | a string to identify an eXo node in a cluster for exemple
 | TARGET_INFLUXDB_URL | NO | `http://localhost:8086` | the full url of the Influxdb server to send the metrics
@@ -56,8 +57,20 @@ Several aspects of JMXTrans container are customizable with the following enviro
 | TARGET_INFLUXDB_PASSWORD | NO | `nothing` | the Influxdb password
 | TARGET_INFLUXDB_CREATE_DB | NO | `true` | does JMXTrans create the Influxdb database if needed
 | TARGET_INFLUXDB_RETENTION_POLICY | NO | `autogen` | the Influxdb rentention policy name to use
-| JMXTRANS_POOLING_FREQUENCY | NO | `30` | the JMXTrans pooling frequency in seconds
+| JMXTRANS_POOLING_FREQUENCY | NO | `30` | the JMXTrans polling frequency in seconds
 | JMXTRANS_LOG_LEVEL | NO | `WARN` | the JMXTrans logging level (DEBUG|INFO|WARN|ERROR|FATAL)
+
+Credentials are handed to JMXTrans as JVM system properties (the JSON configs reference them as `${TARGET_*}`), so they are visible in the process arguments inside the container. Do not share the container's PID namespace with untrusted workloads.
+
+# Health check
+
+The image ships a health check (`/opt/jmxtrans/healthcheck.sh`) that is healthy only when the JMXTrans JVM is running, the InfluxDB `/ping` endpoint answers and the target JMX port accepts connections.
+
+# Testing
+
+* `test/smoke.sh [image]` runs the image against a real JMX endpoint and a real InfluxDB and checks that metrics are written. CI runs it on every pull request.
+* `docker compose -f test/docker-compose.yml up --build` starts a complete eXo Platform + JMXTrans + InfluxDB + Grafana stack (the InfluxDB datasource is provisioned in Grafana).
+  Grafana is on http://localhost:3000 with anonymous read-only access, and six dashboards are provisioned in the `eXo` folder from `test/grafana/dashboards/`: *Overview* (all hosts side by side), *JVM*, *Tomcat and caches*, *Caches* (per-cache selector, hit ratio, misses, capacity), *JCR and Infinispan* and *Database pools*. Edit the JSON files to change them; Grafana reloads them every 30 seconds.
 
 # Collected metrics
 
