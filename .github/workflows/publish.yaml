@@ -1,5 +1,7 @@
 name: Create and publish a Docker image
 
+permissions: {}
+
 on:
   push:
     tags:
@@ -42,7 +44,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     needs: parse-docker-build-env
     permissions:
-      actions: write
+      actions: write  # GitHub Actions build cache used by the shared build action
       contents: read
     strategy:
       matrix:
@@ -54,7 +56,7 @@ jobs:
             runner: ubuntu-24.04-arm
             arch: arm64
     steps:
-      - uses: exo-actions/buildDockerImage-action/build-and-push-image@v1
+      - uses: exo-actions/buildDockerImage-action/build-and-push-image@184f338278b1835c06cb6c947d3677c3092ad469 # v1
         id: build
         with:
           dockerImage: ${{ env.DOCKER_IMAGE }}
@@ -65,7 +67,7 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - name: Save digest
         run: echo "${{ steps.build.outputs.digest }}" > "/tmp/${{ matrix.arch }}.digest"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: ${{ matrix.arch }}-digest
           path: /tmp/${{ matrix.arch }}.digest
@@ -79,15 +81,15 @@ jobs:
     permissions:
       actions: read
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: amd64-digest
           path: /tmp/digests
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: arm64-digest
           path: /tmp/digests
-      - uses: exo-actions/buildDockerImage-action/merge-manifest@v1
+      - uses: exo-actions/buildDockerImage-action/merge-manifest@184f338278b1835c06cb6c947d3677c3092ad469 # v1
         with:
           dockerImage: ${{ env.DOCKER_IMAGE }}
           dockerImageTag: ${{ needs.parse-docker-build-env.outputs.buildTags }}
