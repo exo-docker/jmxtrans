@@ -1,0 +1,467 @@
+{
+  "uid": "exo-caches",
+  "title": "eXo - Caches",
+  "tags": [
+    "exo",
+    "cache"
+  ],
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "graphTooltip": 1,
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "bargauge",
+      "title": "Hit ratio since start (selected caches)",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "exo-influxdb"
+          },
+          "refId": "A",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT last(\"HitCount\") * 100.0 / (last(\"HitCount\") + last(\"MissCount\")) FROM \"exo_cache\" WHERE \"host\" =~ /^$host$/ AND \"typeName\" =~ /^$cache$/ AND time > now() - 5m GROUP BY \"typeName\"",
+          "alias": "$tag_typeName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "color": {
+            "mode": "continuous-BlPu"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "valueMode": "color",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false,
+          "fields": ""
+        }
+      },
+      "id": 1,
+      "datasource": {
+        "type": "influxdb",
+        "uid": "exo-influxdb"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*name=\"?([^\",]+)\"?.*",
+            "renamePattern": "$1"
+          }
+        }
+      ]
+    },
+    {
+      "type": "bargauge",
+      "title": "Misses since start (selected caches)",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "exo-influxdb"
+          },
+          "refId": "A",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT last(\"MissCount\") FROM \"exo_cache\" WHERE \"host\" =~ /^$host$/ AND \"typeName\" =~ /^$cache$/ AND time > now() - 5m GROUP BY \"typeName\"",
+          "alias": "$tag_typeName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0,
+          "color": {
+            "mode": "continuous-BlPu"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "valueMode": "color",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false,
+          "fields": ""
+        }
+      },
+      "id": 2,
+      "datasource": {
+        "type": "influxdb",
+        "uid": "exo-influxdb"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*name=\"?([^\",]+)\"?.*",
+            "renamePattern": "$1"
+          }
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Hits per second",
+      "description": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "exo-influxdb"
+          },
+          "refId": "A",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT non_negative_derivative(mean(\"HitCount\"), 1s) FROM \"exo_cache\" WHERE \"host\" =~ /^$host$/ AND \"typeName\" =~ /^$cache$/ AND $timeFilter GROUP BY time($__interval), \"typeName\" fill(null)",
+          "alias": "$tag_typeName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*name=\"?([^\",]+)\"?.*",
+            "renamePattern": "$1"
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 3,
+      "datasource": {
+        "type": "influxdb",
+        "uid": "exo-influxdb"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Misses per second",
+      "description": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "exo-influxdb"
+          },
+          "refId": "A",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT non_negative_derivative(mean(\"MissCount\"), 1s) FROM \"exo_cache\" WHERE \"host\" =~ /^$host$/ AND \"typeName\" =~ /^$cache$/ AND $timeFilter GROUP BY time($__interval), \"typeName\" fill(null)",
+          "alias": "$tag_typeName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*name=\"?([^\",]+)\"?.*",
+            "renamePattern": "$1"
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 4,
+      "datasource": {
+        "type": "influxdb",
+        "uid": "exo-influxdb"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Entries (Size)",
+      "description": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "exo-influxdb"
+          },
+          "refId": "A",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT mean(\"Size\") FROM \"exo_cache\" WHERE \"host\" =~ /^$host$/ AND \"typeName\" =~ /^$cache$/ AND $timeFilter GROUP BY time($__interval), \"typeName\" fill(null)",
+          "alias": "$tag_typeName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*name=\"?([^\",]+)\"?.*",
+            "renamePattern": "$1"
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 5,
+      "datasource": {
+        "type": "influxdb",
+        "uid": "exo-influxdb"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Capacity (MaxNodes)",
+      "description": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "exo-influxdb"
+          },
+          "refId": "A",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "query": "SELECT mean(\"MaxNodes\") FROM \"exo_cache\" WHERE \"host\" =~ /^$host$/ AND \"typeName\" =~ /^$cache$/ AND $timeFilter GROUP BY time($__interval), \"typeName\" fill(null)",
+          "alias": "$tag_typeName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*name=\"?([^\",]+)\"?.*",
+            "renamePattern": "$1"
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "id": 6,
+      "datasource": {
+        "type": "influxdb",
+        "uid": "exo-influxdb"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 20,
+        "w": 12,
+        "h": 8
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "host",
+        "label": "Host",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "exo-influxdb"
+        },
+        "query": "SHOW TAG VALUES FROM \"jvm_memory_heap\" WITH KEY = \"host\"",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "allValue": ".*",
+        "sort": 1
+      },
+      {
+        "name": "cache",
+        "label": "Cache",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "exo-influxdb"
+        },
+        "query": "SHOW TAG VALUES FROM \"exo_cache\" WITH KEY = \"typeName\" WHERE \"host\" =~ /^$host$/",
+        "regex": "/(?<value>.*name=\"?(?<text>[^\",]+)\"?)$/",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "allValue": ".*",
+        "sort": 1
+      }
+    ]
+  },
+  "links": [
+    {
+      "type": "dashboards",
+      "tags": [
+        "exo"
+      ],
+      "title": "eXo dashboards",
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true,
+      "icon": "external link"
+    }
+  ],
+  "annotations": {
+    "list": []
+  }
+}
