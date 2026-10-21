@@ -18,7 +18,7 @@ RUN set -ex \
     && echo "${JMXTRANS_SHA256}  jmxtrans-all.jar" | sha256sum -c -
 
 # Stage 2: Final Image
-FROM azul/zulu-openjdk-alpine:17-jre-headless-latest@sha256:4d8aefa8af4de48ef1506ffd5bbe726ffa91b22604d6812be6fe5f279f766621
+FROM azul/zulu-openjdk-alpine:20-jre-headless-latest@sha256:08b51edd555a2d9200bc075a554d306a8ef68d80c5b9532ef0b4e79dd9cc99ab
 
 LABEL maintainer="eXo Platform <docker@exoplatform.com>" \
       org.opencontainers.image.title="jmxtrans" \
