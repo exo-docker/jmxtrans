@@ -50,7 +50,7 @@ RUN chmod +x ./jmxtrans.sh ./healthcheck.sh \
     && mkdir -p ${JMXTRANS_LOG_DIR} \
     && chown -R nobody:nogroup ${JMXTRANS_LOG_DIR}
 
-USER nobody:nogroup
+USER 65534:65533
 
 ENTRYPOINT ["/sbin/tini", "-g", "--"]
 HEALTHCHECK --interval=60s --timeout=10s --start-period=30s CMD ["/opt/jmxtrans/healthcheck.sh"]
