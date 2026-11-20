@@ -89,7 +89,7 @@ jobs:
         with:
           name: arm64-digest
           path: /tmp/digests
-      - uses: exo-actions/buildDockerImage-action/merge-manifest@184f338278b1835c06cb6c947d3677c3092ad469 # v1
+      - uses: exo-actions/buildDockerImage-action/merge-manifest@5f1bf3f0f8844e2caf872ba9b45474b13275f8d5 # v1
         with:
           dockerImage: ${{ env.DOCKER_IMAGE }}
           dockerImageTag: ${{ needs.parse-docker-build-env.outputs.buildTags }}
